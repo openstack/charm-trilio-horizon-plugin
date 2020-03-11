@@ -70,14 +70,14 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
 
     # TODO: drop when package does this
     def copy_files(self):
-        for panel in glob.glob("src/files/trilio/panels/*"):
+        for panel in glob.glob("files/trilio/panels/*"):
             shutil.copy(
                 panel,
                 os.path.join(
                     HORIZON_PATH, "openstack_dashboard/local/enabled"
                 ),
             )
-        for templatetag in glob.glob("src/files/trilio/templatetags/*"):
+        for templatetag in glob.glob("files/trilio/templatetags/*"):
             shutil.copy(
                 templatetag,
                 os.path.join(HORIZON_PATH, "openstack_dashboard/templatetags"),
@@ -86,12 +86,12 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
             "/usr/lib/python*/**/workloads_admin/index.html", recursive=True
         ):
             shutil.copy(
-                "src/files/trilio/templates/workload_admin/index.html",
+                "files/trilio/templates/workload_admin/index.html",
                 index_html,
             )
 
     # TODO: drop when package does this
     def collectstatic_and_compress(self):
         python = "/usr/bin/python{}".format(hookenv.config("python-version"))
-        subprocess.check_call([python, MANAGE_PY, "collectstatic"])
+        subprocess.check_call([python, MANAGE_PY, "collectstatic", "--noinput"])
         subprocess.check_call([python, MANAGE_PY, "compress", "--force"])
