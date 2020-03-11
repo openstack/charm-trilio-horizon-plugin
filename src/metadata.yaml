@@ -1,14 +1,17 @@
----
 name: trilio-horizon-plugin
-summary: TrilioVault Horizon Plugin
-maintainer: Trilio Support <support@trilio.io>
+display-name: TrilioVault Horizon Plugin
+maintainer: OpenStack Charmers <openstack-discuss@lists.openstack.org>
+summary: Horizon Plugin for TrilioVault
 description: |
-  Openstack Dashboard - Horizon plugin for TrilioVault
+  TrilioVault provides a backup and recovery solution that natively
+  integrates with OpenStack Clouds.
+  .
+  This charm provides the TrilioVault Horizon plugin for use with the
+  OpenStack Dashboard as part of the TrilioVault solution.
 tags:
   - openstack
   - storage
   - backup
-  - TVMv3.4
 subordinate: true
 series:
   - xenial

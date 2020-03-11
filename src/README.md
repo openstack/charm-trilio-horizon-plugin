@@ -1,33 +1,23 @@
 # Overview
 
-TrilioVault Horizon Plugin is a plugin of TrilioVault which is installed
-on the Openstack and provides TrilioVault UI components.
+This charm provides the TrilioVault Horizon plugin for the OpenStack Dashboard
+and forms part of the [TrilioVault Cloud Backup solution][trilio.io].
 
 # Usage
 
-TrilioVault Horizon Plugin is a sub-ordinate charm of openstack-dashboard
+TrilioVault Horizon Plugin is a subordinate charm of openstack-dashboard
 and relies on services from openstack-dashboard.
 
 Steps to deploy the charm:
 
-juju deploy trilio-horizon-plugin
+    juju deploy trilio-horizon-plugin
+    juju deploy openstack-dashboard
+    juju add-relation trilio-horizon-plugin openstack-dashboard
 
-juju deploy openstack-dashboard
+# Bugs
 
-juju add-relation trilio-horizon-plugin openstack-dashboard
+Please report bugs on [Launchpad][lp-bugs-charm-trilio-horizon-plugin].
 
-# Configuration
+[lp-bugs-charm-trilio-horizon-plugin]: https://bugs.launchpad.net/charm-trilio-horizon-plugin/+filebug
+[trilio.io]: https://www.trilio.io/triliovault/openstack
 
-python-version: "Openstack base python version(2 or 3)"
-
-NOTE - Default value is set to "3". Please ensure to update this based on python version since installing
-       python3 packages on python2 based setup might have unexpected impact.
-
-TrilioVault Packages are downloaded from the repository added in below config parameter. Please change this only if you wish to download
-TrilioVault Packages from a different source.
-
-triliovault-pkg-source: Repository address of triliovault packages
-
-# Contact Information
-
-Trilio Support <support@trilio.com>
