@@ -1,0 +1,9 @@
+options:
+  python-version:
+    type: int
+    default: 3
+    description: Openstack base python version(2 or 3)
+  triliovault-pkg-source:
+    type: string
+    default: "deb [trusted=yes] https://apt.fury.io/triliodata-3-4/ /"
+    description: Repository address of triliovault packages

@@ -1,0 +1,19 @@
+---
+name: trilio-horizon-plugin
+summary: TrilioVault Horizon Plugin
+maintainer: Trilio Support <support@trilio.io>
+description: |
+  Openstack Dashboard - Horizon plugin for TrilioVault
+tags:
+  - openstack
+  - storage
+  - backup
+  - TVMv3.4
+subordinate: true
+series:
+  - xenial
+  - bionic
+requires:
+  dashboard-plugin:
+    interface: dashboard-plugin
+    scope: container

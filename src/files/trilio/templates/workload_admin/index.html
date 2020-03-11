@@ -1,0 +1,1799 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}
+  {% trans "TrilioVault Nodes and Workload Types" %}
+{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("TrilioVault Dashboard") %}
+  <link type="text/css" rel="stylesheet"
+        href='{{ STATIC_URL }}dashboards/css/dashboard.css'/>
+  <link type="text/css" rel="stylesheet"
+        href='{{ STATIC_URL }}dashboards/css/tvault_dashboard.css'/>
+  <link type="text/css" rel="stylesheet"
+        href='{{ STATIC_URL }}dashboards/css/jquery.dataTables.css'/>
+  <link type="text/css" rel="stylesheet"
+        href='{{ STATIC_URL }}dashboards/css/buttons.dataTables.min.css'/>
+  <link type="text/css" rel="stylesheet"
+        href='{{ STATIC_URL }}dashboards/css/daterangepicker.css'/>
+  <link type="text/css" rel="stylesheet"
+        href='{{ STATIC_URL }}dashboards/css/jqplot/jquery.jqplot.min.css'/>
+  <link type="text/css" rel="stylesheet"
+        href="{{ STATIC_URL }}dashboards/css/jqplot/jquery-ui.min.css" />
+  <link type="text/css" rel="stylesheet"
+        href="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.9/css/dataTables.checkboxes.css" />
+  <link type="text/css" rel="stylesheet"
+        href="{{ STATIC_URL }}dashboards/css/treeview.css" />
+  <style>
+  .workloads_list tbody {
+    margin: 0 auto;
+    width: 100%;
+    clear: both;
+    border-collapse: collapse;
+    -ms-word-break: break-all;
+    word-break: break-all;
+
+    word-break: break-word;
+
+    -webkit-hyphens: auto;
+       -moz-hyphens: auto;
+        -ms-hyphens: auto;
+            hyphens: auto;
+ }
+ div.dt-buttons{float:right !important;}
+ .perform_width {
+    width: 29%
+ }
+ .type_zone {
+    width: 5%
+ }
+ .user_width {
+    width: 8%
+ }
+a.text-white, a:link.text-white, a:visited.text-white {
+   color: #ffffff;
+}
+</style>
+
+{% endblock page_header %}
+
+{% block main %}
+  <div class="tdb_main_content">
+
+  <div class="tdb_quota_dynamic t_width">
+    <div class="t_inline_block t_width">
+      <div id="quota_loader" class="t_width t_inner_cell">
+        <img
+          src="{{ STATIC_URL }}dashboards/images/loader.gif"
+          alt="loading..."
+          width="214"
+          height="138" />
+      </div>
+      <div id="data_quota" class="t_inline_block t_width"></div>
+    </div>
+    <button id="btn_quota_refresh"
+            type="button"
+            class="btn btn-default btn-sm pull-right t_refresh_btn"
+            class="t_refresh_btn">
+      <i class="t_refresh_image"></i>
+
+    </button>
+  </div>
+
+  <div id="tdb_tabs_container">
+
+    <ul id="dahsboard_tabs" class="nav nav-tabs" >
+      <li class="active">
+        <a data-toggle="tab" href="#tab_workloads"> Workloads </a>
+      </li>
+      <li>
+        <a data-toggle="tab" id="config_backup" href="#tab_config_backup">Configuration Backup </a>
+      </li>
+      <li>
+        <a data-toggle="tab" href="#tab_nodes"> Nodes </a>
+      </li>
+      <li>
+        <a data-toggle="tab" href="#tab_contego"> Data Movers </a>
+      </li>
+      <li>
+        <a data-toggle="tab" href="#tab_storage"> Storage </a>
+      </li>
+      <!--
+      <li>
+        <a data-toggle="tab" href="#tab_activities"> Activities </a>
+      </li>
+      --!>
+      <li>
+        <a data-toggle="tab" href="#tab_auditlog"> Audit </a>
+      </li>
+      <li>
+        <a data-toggle="tab" id="settings" href="#tab_settings"> Settings </a>
+      </li>
+      <li>
+        <a data-toggle="tab" id="license" href="#tab_license"> License </a>
+      </li>
+      <li>
+        <a data-toggle="tab" id="policy" href="#tab_workload_policy"> Policy </a>
+      </li>
+      <li>
+        <a data-toggle="tab" id="chargeback" href="#tab_usage"> Usage </a>
+      </li>
+     </ul>
+
+    <div class="tab-content t_tab_content" >
+
+      <div id="tab_workloads" class="tab-pane active" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">Workloads</h3>
+            <button id="btn_workloads_refresh"
+                    type="button"
+                    class="btn btn-default btn-sm pull-right t_refresh_btn"
+                    class="t_refresh_btn">
+              <i class="t_refresh_image"></i>
+            </button>
+            <div><span style="display:none;" id="workloads_msg"></span></div>
+          </div>
+        </div>
+        <div id="workloads_loader" class="t_width t_inner_cell">
+          <img
+            src="{{ STATIC_URL }}dashboards/images/loader.gif"
+            alt="loading..."
+            width="214"
+            height="138" />
+        </div>
+        <div id="data_workloads" class="t_inline_block t_width">
+        {% include "admin/workloads_admin/workloads/workloads.html" %}
+        </div>
+      </div>
+
+      <div id="tab_nodes" class="tab-pane" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header" >
+            <h3 class="table_title t_table_title">TrilioVault Nodes</h3>
+            <button id="btn_nodes_refresh"
+                    type="button"
+                    class="btn btn-default btn-sm pull-right t_refresh_btn"
+                    class="t_refresh_btn">
+              <i class="t_refresh_image"></i>
+            </button>
+          </div>
+        </div>
+        <div class="t_inline_block t_width t_scroller_550">
+          <div id="nodes_loader" class="t_width t_display_none">
+            <img
+              src="{{ STATIC_URL }}dashboards/images/loader.gif"
+              alt="loading..."
+              width="214"
+              height="138" />
+          </div>
+          <div id="data_nodes" class="t_inline_block t_width t_border_top"></div>
+        </div>
+      </div>
+
+      <div id="tab_contego" class="tab-pane" role="tabpanel" >
+        <div id="contego_services" >
+          <div class="table_caption">
+            <div class="table_header t_table_header" >
+              <h3 class="table_title t_table_title">Contego Services</h3>
+              <button id="btn_contego_refresh"
+                      type="button"
+                      class="btn btn-default btn-sm pull-right t_refresh_btn"
+                      class="t_refresh_btn">
+                <i class="t_refresh_image"></i>
+              </button>
+            </div>
+          </div>
+          <div class="t_inline_block t_width">
+            <div id="contego_loader" class="t_width t_display_none">
+              <img
+                src="{{ STATIC_URL }}dashboards/images/loader.gif"
+                alt="loading..."
+                width="214"
+                height="138" />
+            </div>
+            <div id="data_contego" class="t_inline_block t_width"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab_storage" class="tab-pane" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">Storage</h3>
+            <div class="pull-right">
+		<button id="btn_storage_refresh"
+			  type="button"
+			class="btn btn-default btn-sm pull-right t_refresh_btn"
+			class="t_refresh_btn">
+		  <i class="t_refresh_image"></i>
+		</button>
+            </div>
+          </div>
+        </div>
+          <div id="storage_loader" class="t_width t_display_none">
+            <img
+              src="{{ STATIC_URL }}dashboards/images/loader.gif"
+              alt="loading..."
+              width="214"
+              height="138" />
+          </div>
+          <div id="data_storage" class="t_inline_block t_width t_margin_top_minus"></div>
+      </div>
+      <!--
+      <div  id="tab_activities" class="tab-pane" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header t_inline_block t_width">
+            <h3 class="table_title t_table_title">Recent Activities
+              (Last <span id="activities_time">24</span> hrs)</h3>
+            <div id="dashboard_activities_list_length" class="pull-right">
+              <label class="t_inline_flex t_margin_top">Time in Hours &nbsp;&nbsp;
+                <select id="recent_acts_time_options"
+                        onchange="loadRecentActivities(this.value);"
+                        class="t_col150">
+                  <option value="1440" selected="selected">24 hrs (1 day)</option>
+                  <option value="2880">48 hrs (2 days)</option>
+                  <option value="4320">72 hrs (3 days)</option>
+                  <option value="5760">96 hrs (4 days)</option>
+                  <option value="7200">120 hrs (5 days)</option>
+                  <option value="8640">144 hrs (6 days)</option>
+                  <option value="10080">168 hrs (7 days)</option>
+                </select>
+                &nbsp;&nbsp;
+              </label>
+              <button id="btn_activities_refresh"
+                      type="button"
+                      class="btn btn-default btn-sm pull-right t_refresh_btn"
+                      class="t_refresh_btn">
+                <i class="t_refresh_image"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="activities_loader" class="t_width t_display_none">
+          <img
+            src="{{ STATIC_URL }}dashboards/images/loader.gif"
+            alt="loading..."
+            width="214"
+            height="138" />
+        </div>
+        <div id="data_activities" class="t_inline_block t_width"></div>
+      </div>
+      --!>
+
+      <div id="tab_auditlog" class="tab-pane" role="tabpanel" >
+
+        <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">Audit Log</h3>
+            <div class="pull-right">
+              <div id="dashboard-report-range"
+                   class="tooltips btn btn-fit-height blue-steel t_margin_top3"
+                   data-placement="top"
+                   data-original-title="Change audit log date range">
+                <i class="icon-calendar"></i>&nbsp;
+                <span class="thin uppercase visible-lg-inline-block">
+                  &nbsp;&nbsp;
+                </span>
+                <i class="fa fa-angle-down"></i>
+              </div>
+              <button id="btn_auditlog_refresh"
+                      type="button"
+                      class="btn btn-default btn-sm pull-right t_refresh_btn"
+                      class="t_refresh_btn">
+                <i class="t_refresh_image"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="auditlog_loader" class="t_width t_display_none">
+          <img
+            src="{{ STATIC_URL }}dashboards/images/loader.gif"
+            alt="loading..."
+            width="214"
+            height="138" />
+        </div>
+        <div id="data_auditlog" class="t_inline_block t_width"></div>
+
+      </div>
+
+      <div id="tab_settings" class="tab-pane" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header t_inline_block  t_width">
+            <h3 class="table_title t_table_title">Settings</h3>
+          </div>
+        </div>
+        <table class="table table-bordered t_width">
+        	<tr>
+				<td class="t_col350">Click on the following button to change email settings:</td>
+				<td>
+				  <a href="/admin/workloads_admin/settings"
+					 title="Change Settings"
+					 class="btn btn-small ajax-modal btn-primary text-white"
+					 id="workload_nodes__action_settings">
+					Modify Email Settings
+				  </a>
+				</td>
+        	</tr>
+        	<tr>
+				<td class="t_col350">Cloud Wide TrilioVault Job Schduler:</td>
+				<td>
+				  <a href="/admin/workloads_admin/jobscheduler"
+					 title="Change Job Scheduler Settings"
+					 class="btn btn-small ajax-modal btn-primary text-white"
+					 id="workload_nodes__action_job_scheduler">
+					 Disable/Enable Job Scheduler
+				  </a>
+				</td>
+        	</tr>
+        </table>
+
+      </div>
+
+      <div id="tab_license" class="tab-pane" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">License</h3>
+		<div class="pull-right">
+		<a href="/admin/workloads_admin/license/updatelicense"
+                                         class="btn btn-small ajax-modal btn-primary"
+                                         id="license_update"
+                                         style="margin: 2% 0 2% 0;"><span class="fa fa-cog"></span>&nbsp;
+                                         Update License 
+                   </a>
+
+                <a
+                                         title="Check Validity"
+                                         class="btn btn-small btn-primary"
+                                         id="check_license_validity"
+                                         style="margin: 2% 0 2% 0;"><span class="fa fa-check"></span>&nbsp;
+                                         Check Validity
+                   </a>
+                <!--&nbsp;
+                <a id="btn_license_refresh"
+                        class="btn btn-default btn-sm pull-right t_refresh_btn"
+                        style="margin: 2% 0 2% 0;">
+                        <i class="t_refresh_image"></i>
+                </a>-->
+                </div>
+                <div style="margin-bottom: 0.5%;">
+                	<span style="color:red;display:none;" id="license_validity_error"></span>
+                </div>
+
+          </div>
+        </div>
+        <div class="t_inline_block t_width">
+          <div id="license_loader" class="t_width t_display_none">
+            <img
+              src="{{ STATIC_URL }}dashboards/images/loader.gif"
+              alt="loading..."
+              width="214"
+              height="138" />
+          </div>
+          <div id="data_license" class="t_inline_block t_width"></div>
+        </div>
+      </div>
+
+      <div id="tab_config_backup" class="tab-pane" role="tabpanel" >
+          <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">Configuration Backup</h3>
+		<div class="pull-right">
+		<a href="/admin/workloads_admin/config_backup/backupjobscheduler"
+                                         title="Change Scheduler Settings"
+                                         class="btn btn-small ajax-modal btn-primary"
+                                         id="config_backup_scheduler"
+					 style="margin: 2% 0 2% 0;"><span class="fa fa-cog"></span>&nbsp;
+                                         Settings
+                   </a>
+		<a href="/admin/workloads_admin/config_backup/manualbackup" 
+			title="Backup Now" 
+			class="btn btn-small ajax-modal btn-default" 
+			id="config_backup_manual_create"
+			style="margin: 2% 0 2% 0;"><span class="fa fa-plus"></span>&nbsp;Backup Now
+		</a>&nbsp;
+		<a id="btn_config_backup_refresh" 
+			class="btn btn-default btn-sm pull-right t_refresh_btn"
+			style="margin: 2% 0 2% 0;">
+                	<i class="t_refresh_image"></i>
+                </a>
+	        </div>
+
+          </div>
+          </div>
+	  <span id="backup_error_msg" style="color:red;display:none;"></span>
+	  <div class="t_inline_block t_width">
+           <div id="config_backup_loader" class="t_width t_display_none">
+             <img
+              src="{{ STATIC_URL }}dashboards/images/loader.gif"
+              alt="loading..."
+              width="214"
+              height="138" />
+           </div>
+
+           <div id="data_config_backup" class="t_inline_block t_width">
+           </div> 
+	 </div>
+     </div>
+
+     <!--Workloads Policy-->
+     <div id="tab_workload_policy" class="tab-pane" role="tabpanel" >
+          <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">Policy</h3>
+                <div class="pull-right">
+                <a href="/admin/workloads_admin/workload_policy/create"
+                                         title="Add New Policy"
+                                         class="btn btn-small ajax-modal btn-primary"
+                                         id="policy_create"
+                                         style="margin: 2% 0 2% 0;"><span class="fa fa-cog"></span>&nbsp;
+                                         New Policy
+                   </a>&nbsp;
+                <a id="btn_workload_policy_refresh"
+                        class="btn btn-default btn-sm pull-right t_refresh_btn"
+                        style="margin: 2% 0 2% 0;">
+                        <i class="t_refresh_image"></i>
+                </a>
+                </div>
+
+          </div>
+          </div>
+          <span id="workload_policy_msg" style="color:red;display:none;"></span>
+          <div class="t_inline_block t_width">
+           <div id="workload_policy_loader" class="t_width t_display_none">
+             <img
+              src="{{ STATIC_URL }}dashboards/images/loader.gif"
+              alt="loading..."
+              width="214"
+              height="138" />
+           </div>
+           <div id="data_workload_policy" class="t_inline_block t_width">
+           </div>
+         </div>
+     </div>
+
+
+     <div id="tab_usage" class="tab-pane" role="tabpanel" >
+        <div class="table_caption">
+          <div class="table_header t_table_header">
+            <h3 class="table_title t_table_title">Usage</h3>
+            <button id="btn_usage_refresh"
+                    type="button"
+                    class="btn btn-default btn-sm pull-right t_refresh_btn"
+                    class="t_refresh_btn">
+              <i class="t_refresh_image"></i>
+            </button>
+          </div>
+        </div>
+        <div id="usage_loader" class="t_width t_display_none">
+          <img
+            src="{{ STATIC_URL }}dashboards/images/loader.gif"
+            alt="loading..."
+            width="214"
+            height="138" />
+        </div>
+        <div class="t_inline_block t_width">
+               <div id="tenant_list_area" style="width:50%;display:inline;"></div>
+               <div style="float:right;">
+                        <button id="btn_usage_export"
+                        type="button"
+                        class="btn btn-default">
+                        <i class="fa fa-download"></i>Download CSV Summary
+                        </button>
+                </div>
+        <br/><br/>
+        <div id="data_usage" class="well" style="background-color:white;">
+            <ul id="usage_tree">
+            
+            </ul>
+        </div>
+
+        </div>
+     </div>
+
+
+
+
+    </div>
+
+  </div>
+</div>
+<div class="modal fade" id="confirm-scheduler-update" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Scheduler Update</h4>
+                </div>
+                <div class="modal-body">
+                        <p>You have selected Scheduler Enable/Disable. Please confirm your selection.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-cancel-action" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-ok">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <script type="text/javascript">
+  var isConfigBackupTab=0;
+  var isUsageTab=0;
+  var workloads_table;
+  window.onload = function(){
+      sessionStorage.clear();
+      $.extend({
+         getUrlVars: function(){
+         var vars = [], hash;
+         var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+         for(var i = 0; i < hashes.length; i++) {
+           hash = hashes[i].split('=');
+           vars.push(hash[0]);
+           vars[hash[0]] = hash[1];
+         }
+         return vars;
+         },
+         getUrlVar: function(name) {
+           return $.getUrlVars()[name];
+          }
+      });
+
+      setting = $.getUrlVar('tab')
+      if(setting == 'config_backup'){
+          $("#config_backup").trigger('click')
+      }
+      else if(setting == 'license'){
+          $("#license").trigger('click')
+      }
+      else if(setting == 'policy'){
+          $("#policy").trigger('click')
+      }
+      else if( typeof setting != 'undefined') {
+          $('#settings').trigger("click")
+      }
+      
+      context_path = "{{WEBROOT}}";
+       if(context_path.length <= 1)  
+        context_path = "";
+      static_url = "{{ STATIC_URL }}";
+      if (static_url.length > 8){
+        context_path = (static_url).substring(0, static_url.length - 8);
+      }
+      quota_url = context_path + '/admin/workloads_admin/quota';
+      workloads_url = context_path + '/admin/workloads_admin/workloads/';
+      storage_url = context_path + '/admin/workloads_admin/storage/';
+      nodes_url = context_path + '/admin/workloads_admin/nodes/';
+      contego_url = context_path + '/admin/workloads_admin/contego/';
+      recent_activities_url = context_path + '/admin/workloads_admin/recent_acts/';
+      audit_log_url = context_path + '/admin/workloads_admin/auditlog/';
+      license_url = context_path + '/admin/workloads_admin/license/';
+      nfs_url = context_path + '/admin/workloads_admin/nfs';
+      config_backup_url=context_path + '/admin/workloads_admin/config_backup/';
+      policy_url = context_path + '/admin/workloads_admin/workload_policy/';
+      $("#workload_nodes__action_settings").attr("href", context_path + "/admin/workloads_admin/settings");
+      $("#workload_nodes__action_job_scheduler").attr("href", context_path + "/admin/workloads_admin/jobscheduler");
+      $("#config_backup_scheduler").attr("href", context_path + "/admin/workloads_admin/config_backup/backupjobscheduler");
+      $("#config_backup_manual_create").attr("href", context_path + "/admin/workloads_admin/config_backup/manualbackup");
+      $("#license_update").attr("href", context_path + "/admin/workloads_admin/license/updatelicense");
+      $("#policy_create").attr("href", context_path + "/admin/workloads_admin/workload_policy/create");
+      var fileList = [];
+      fileList.push('{{STATIC_URL}}dashboards/js/jquery.dataTables.min.js');
+      fileList.push('//gyrocode.github.io/jquery-datatables-checkboxes/1.2.9/js/dataTables.checkboxes.min.js')
+      fileList.push('{{STATIC_URL}}dashboards/js/dataTables.buttons.min.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/buttons.html5.min.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/buttons.flash.min.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jquery.sparkline.min.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jquery.easypiechart.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jquery.easing.min.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/moment.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/daterangepicker.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jqplot/excanvas.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jqplot/jquery.jqplot.min.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jqplot/jqplot.barRenderer.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jqplot/jqplot.categoryAxisRenderer.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/jqplot/jqplot.pointLabels.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/common.js');
+      fileList.push('{{STATIC_URL}}dashboards/js/treeview.js');
+      $.ajaxSetup({async:false});
+      $.when(
+        initJavascriptFiles(fileList)
+      ).then(
+        //initDataTables(),
+        $.ajaxSetup({async:true}),
+        loadWorkloadsData(),
+        initDashboardDaterange(),
+        initRefreshEvents()
+      );
+      $.ajaxSetup({async:true});
+      loadQuotaData('')
+      history.pushState(null, "", location.href.split("?")[0]);
+    };
+
+    function initJavascriptFiles(fileList){
+      for(i = 0; i < fileList.length; i++){
+        fileName = fileList[i];
+        $.getScript( fileName )
+          .done(function( script, textStatus ) {
+            //console.log( textStatus + ": " + fileName  + " loaded successfully");
+          })
+          .fail(function( jqxhr, settings, exception ) {
+            //console.log( exception + ": unable to load " + fileName );
+          });
+      }
+    }
+
+    function initRefreshEvents(){
+      $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+        var id = $(e.target).attr("href").substr(1);
+        isConfigBackupTab=0;
+	if(id != 'tab_usage' && isUsageTab==1){
+	  loadQuotaData('');
+	  isUsageTab=0;
+	}       
+        if(id == 'tab_workloads'){
+          workloads_table=$("#workload_list").DataTable();
+          sessionStorage.clear();
+          loadWorkloadsData();
+	}else if(id == 'tab_nodes'){
+          loadNodesData('')
+        }else if(id == 'tab_contego'){
+          loadContegoData('');
+        }else if(id == 'tab_storage'){
+          loadStorageStats('');
+        //}else if(id == 'tab_activities'){
+        //loadRecentActivities('');
+        }else if(id == 'tab_auditlog'){
+          startDate = $('#dashboard-report-range').data('daterangepicker')
+                                            .startDate.format('MM-DD-YYYY')
+          endDate = $('#dashboard-report-range').data('daterangepicker')
+                                              .endDate.format('MM-DD-YYYY')
+          url_params = '?audit_start=' + startDate
+                  + '&audit_end=' + endDate;
+          loadAuditlogData(url_params);
+        }else if(id == 'tab_settings'){
+        }else if(id == 'tab_license'){
+	  loadLicenseData('');
+	  //check validity onlicense tab click
+	  checkLicenseValidity();
+        }else if(id== 'tab_config_backup'){
+          isConfigBackupTab=1;
+	  loadConfigBackup('');
+	}else if(id== 'tab_workload_policy'){
+          loadPolicyData('');
+        }else if(id== 'tab_usage'){
+	  isUsageTab=1;
+          loadProjectList(0,'tenant_list_usage','tenant_list_area'); 
+          loadUsageData();
+        }
+        else if(id== 'tab_usage'){
+             loadProjectList(0,'tenant_list_usage','tenant_list_area'); 
+             loadUsageData();
+        }
+      });
+
+      $( "#btn_quota_refresh" ).on( "click", function() {
+        loadQuotaData('');
+	if(isUsageTab==1){
+	   loadProjectList(0,'tenant_list_usage','tenant_list_area');
+	   loadUsageData();
+	}
+      });
+      $( "#btn_workloads_refresh" ).on( "click", function() {
+        sessionStorage.clear();
+        loadWorkloadsData();
+        //loadQuotaData('');
+      });
+      $( "#btn_nodes_refresh" ).on( "click", function() {
+        loadNodesData('');
+        //loadQuotaData('');
+      });
+      $( "#btn_contego_refresh" ).on( "click", function() {
+        loadContegoData('');
+        //loadQuotaData('');
+      });
+      $( "#btn_storage_refresh" ).on( "click", function() {
+        loadStorageStats('');
+        //loadQuotaData('');
+      });
+      // "#btn_activities_refresh" ).on( "click", function() {
+      //loadRecentActivities('');
+      //});
+      $( "#btn_auditlog_refresh" ).on( "click", function() {
+        startDate = $('#dashboard-report-range').data('daterangepicker')
+                                            .startDate.format('MM-DD-YYYY')
+        endDate = $('#dashboard-report-range').data('daterangepicker')
+                                            .endDate.format('MM-DD-YYYY')
+        url_params = '?audit_start=' + startDate
+                + '&audit_end=' + endDate;
+        loadAuditlogData(url_params);
+      });
+      $( "#btn_license_refresh" ).on( "click", function() {
+        loadLicenseData('');
+        checkLicenseValidity();
+      });
+      $( "#btn_config_backup_refresh" ).on( "click", function() {
+        loadConfigBackup('');
+      });
+     $( "#check_license_validity" ).on( "click", function() {
+        loadLicenseData('');
+        checkLicenseValidity();
+      });
+      $(document).on('click','#csv_button',function(){
+        $("#workloads_loader").attr('style', 'display:block !important;');
+        var tenant_id=sessionStorage.getItem("selected_tenant");
+        $.get(context_path + '/admin/workloads_admin/workloads/', { 'project_id': tenant_id }, function( data ) {
+           var data = JSON.stringify(data);
+           if(data == '')
+            return;
+
+           JSONToCSVConvertor(data, "TVault Workloads", true);
+           $("#workloads_loader").attr('style', 'display:none !important;');
+       });
+    });
+     $(document).on('change',"#tenant_list", function(){
+         sessionStorage.setItem("selected_tenant",this.value);
+         loadWorkloadsData();
+         /*if(this.value.length > 0)
+             loadDivData(context_path + '/admin/workloads_admin/quota?tenant_id='+this.value, '#data_quota', '#quota_loader');
+         else
+             loadDivData(context_path + '/admin/workloads_admin/quota', '#data_quota', '#quota_loader');*/
+     
+     });
+
+     $(document).on('change',"#tenant_list_usage", function(){
+         if(this.value.length > 0)
+         {
+             $(".tenant_tree").attr('style','display:none;');
+             $("#li_"+this.value).removeAttr('style');
+             loadDivData(context_path + '/admin/workloads_admin/quota?tenant_id='+this.value, '#data_quota', '#quota_loader');
+         }
+         else
+         {
+             $(".tenant_tree").removeAttr('style');
+             loadDivData(context_path + '/admin/workloads_admin/quota', '#data_quota', '#quota_loader');
+         }
+     });
+     $(document).on('click','#btn_usage_export',function(){
+         $("#usage_loader").attr('style', 'display:block !important;');
+         var tenant_id=$("#tenant_list_usage").val();
+         $.get(context_path + '/admin/workloads_admin/usage_data/exportUsage', { 'project_id': tenant_id }, function( data ) {
+             $("#usage_loader").attr('style', 'display:none !important;');
+             if(data.status == '200') {
+               obj = data.data;
+               var data = JSON.stringify(obj);
+               if(data == '')
+                  return;
+               JSONToCSVConvertor(data, "TVault Chargeback", true);
+               $("#usage_loader").attr('style', 'display:none !important;');
+               
+              }
+          });
+
+       });
+     $('#confirm-scheduler-update').on('show.bs.modal', function(e) {
+            var data = $(e.relatedTarget).data();
+            var action_selected =(data.recordId).split('#')[2]; //whether enable/disable option selected
+            if(action_selected==1)
+                $("#confirm-scheduler-update-action").html("Enable");
+            else if(action_selected==0)
+                $("#confirm-scheduler-update-action").html("Disable");
+            $('.btn-ok', this).data('workloadId', data.recordId);
+        });
+     $('#confirm-scheduler-update').on('click', '.btn-ok', function(e) {
+            var $modalDiv = $(e.delegateTarget);
+            //To keep the code commom, added single/multiple select flag to the actual id 
+            var total_selected = $(this).data('workloadId').split('#')[1]; //multiple/single row selected
+            if(total_selected == 'single_row')
+            {
+                var workload_id = $(this).data('workloadId').split('#')[0]; //if single row action selected
+                $modalDiv.addClass('loading');
+                $modalDiv.modal('hide').removeClass('loading');
+                schedulerStatusChange($("#check_"+workload_id));
+            }
+            else if(total_selected == 'multiple_row')
+            {
+                var action_selected = $(this).data('workloadId').split('#')[2]; //whether enable/disable option selected 
+                $modalDiv.addClass('loading');
+                $modalDiv.modal('hide').removeClass('loading');
+                if(action_selected==1)
+                    workload_scheduler_setting(1);
+                else if(action_selected==0)
+                    workload_scheduler_setting(0);
+            }
+     });
+     $('#confirm-scheduler-update').on('click', '.btn-cancel-action', function(e) {
+             workloads_table.ajax.reload();       
+     });
+
+       $( "#btn_workload_policy_refresh" ).on( "click", function() {
+         loadPolicyData('');
+      });
+      $( "#btn_usage_refresh" ).on( "click", function() {
+         $("#usage_tree").html(''); 
+         loadProjectList(0,'tenant_list_usage','tenant_list_area');
+         loadUsageData();
+         loadDivData(context_path + '/admin/workloads_admin/quota', '#data_quota', '#quota_loader');
+      });
+
+
+  }
+
+    function initDataTables(){
+      loadWorkloadsData();
+      loadStorageStats();
+      loadNodesData('');
+      loadContegoData('');
+      //loadRecentActivities('1440');
+      //loadAuditlogData('');
+      loadLicenseData('');
+      loadQuotaData('');
+    }
+     
+   function getUITimezone(){
+	cookieArr = document.cookie.split(";")
+	var tz = "UTC";
+	$.each( cookieArr, function( key, value ) {
+	if(value.split("=")[0] == " django_timezone")
+	 tz =  value.split("=")[1];
+	});
+	
+	return  tz.replace(/\"/g, "");
+   }
+
+    var initDashboardDaterange = function () {
+      if (!jQuery().daterangepicker) {
+        return;
+      }
+      var timezoneVal = getUITimezone();
+
+      $('#dashboard-report-range').daterangepicker({
+        opens: ('left'),
+        startDate: moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('days', 1),
+        endDate: moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })),
+        minDate: '01/01/2016',
+        dateLimit: { days: 30 },
+
+        showDropdowns: false,
+        showWeekNumbers: false,
+        timePicker: false,
+
+        ranges: {
+           'Today': [moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })), 
+                      moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal }))],
+           'Yesterday': [moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('days', 1),
+                         moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('days', 1)],
+           'Last 7 Days': [moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('days', 6),
+                            moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal }))],
+           'Last 30 Days': [moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('days', 29),
+                             moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal }))],
+           'This Month': [moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).startOf('month'),
+                          moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).endOf('month')],
+           'Last Month': [moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('month', 1).startOf('month'),
+                           moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('month', 1).endOf('month')]
+        },
+
+        buttonClasses: ['btn btn-sm'],
+        applyClass: ' blue',
+        cancelClass: 'default',
+        format: 'MM/DD/YYYY',
+        separator: ' to ',
+        locale: {
+           applyLabel: 'Apply',
+           fromLabel: 'From',
+           toLabel: 'To',
+           customRangeLabel: 'Custom Range',
+           daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+           monthNames: ['January', 'February', 'March', 'April', 'May',
+                        'June', 'July', 'August', 'September', 'October',
+                        'November', 'December'],
+           firstDay: 1
+        }
+      },
+      function (start, end) {
+        url_params = '?audit_start=' + start.format('MM-DD-YYYY')
+                + '&audit_end=' + end.format('MM-DD-YYYY');
+        loadAuditlogData(url_params);
+        $('#dashboard-report-range span').html(
+              start.format('MMMM D, YYYY') + ' - ' +
+              end.format('MMMM D, YYYY'));
+      } );
+
+      url_audit_start = getParameterByName('audit_start');
+      url_audit_end = getParameterByName('audit_end');
+
+      if(( url_audit_start != null &&
+          url_audit_start != '' &&
+          url_audit_start.length > 0) &&
+          ( url_audit_end != null &&
+          url_audit_end != '' &&
+          url_audit_end.length > 0) ){
+
+        start_date = new Date( url_audit_start.slice(6, 10),
+                    url_audit_start.slice(0,2) - 1,
+                    url_audit_start.slice(3,5));
+
+        end_date = new Date( url_audit_end.slice(6, 10),
+                    url_audit_end.slice(0,2) - 1,
+                    url_audit_end.slice(3,5));
+
+        display_audit_start = moment(start_date).format('MMMM D, YYYY');
+        display_audit_end = moment(end_date).format('MMMM D, YYYY');
+
+        $('#dashboard-report-range span').html(
+            display_audit_start + " - " + display_audit_end
+        );
+
+        $('#dashboard-report-range').data('daterangepicker')
+                .setStartDate(moment(start_date).format('MM/DD/YYYY'));
+        $('#dashboard-report-range').data('daterangepicker')
+                .setEndDate(moment(end_date).format('MM/DD/YYYY'));
+      }else{
+        $('#dashboard-report-range span').html(
+            moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).subtract('days', 1).format('MMMM D, YYYY')
+            + " - " + moment(new Date().toLocaleString('en-US', { timeZone: timezoneVal })).format('MMMM D, YYYY')
+        );
+      }
+    }
+
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function loadNfsWorkloads(value, id) {
+        loadTableData(nfs_url+'?nfs='+value+'&id='+id,
+                 '#nfs_workloads_'+id,
+                 '#nfs_workloads_table_'+id,
+                 '#nfs_workloads_loader_'+id);
+    }
+
+    function loadQuotaData(url_params){
+      loadDivData(quota_url + url_params, '#data_quota', '#quota_loader');
+    }
+
+    function loadWorkloadsData(){
+      setting = $.getUrlVar('tab')
+      if(typeof setting == 'undefined' || setting.indexOf("tab_workloads")!=-1) {
+
+          loadTableData(workloads_url,
+                 '#data_workloads',
+                 '#workload_list',
+                 '#workloads_loader');
+	  
+      }
+     else
+	{ 
+	   if(setting.indexOf("#")!=-1)
+           {
+             setting = setting.split("#")[0]
+           }
+         if(setting == 'config_backup')
+		{
+		  isConfigBackupTab=1;
+	          loadConfigBackup('');
+		}
+         else if(setting == 'license')
+		{
+			loadLicenseData('');
+	               //check validity onlicense tab click
+			 checkLicenseValidity();	
+		}
+         else if(setting == 'policy')
+                {
+                        loadPolicyData('');
+                }
+        }
+    }
+
+    function loadStorageStats(){
+      loadDivData(storage_url, '#data_storage', '#storage_loader');
+    }
+
+    function loadNodesData(url_params){
+      loadDivData(nodes_url + url_params, '#data_nodes', '#nodes_loader');
+    }
+
+    function loadContegoData(url_params){
+      loadTableData(contego_url + url_params,
+                  '#data_contego',
+                  '#contego_services_table',
+                  '#contego_loader');
+    }
+    function loadConfigBackup(url_params){
+      loadTableData(config_backup_url + url_params,
+                  '#data_config_backup',
+                  '#config_backup_table',
+                  '#config_backup_loader');
+    }
+    function loadRecentActivities(timeinminutes){
+      if (timeinminutes == ''){
+        timeinminutes = $('#recent_acts_time_options').val();
+      }
+      url_params = '?activities_time=' + timeinminutes;
+      loadTableData(recent_activities_url + url_params,
+               '#data_activities',
+               '#dashboard_activities_list',
+               '#activities_loader');
+      $('#activities_time').html((timeinminutes/60));
+      $('#recent_acts_time_options').val(timeinminutes);
+    }
+
+    function loadAuditlogData(url_params){
+      loadTableData(audit_log_url + url_params,
+               '#data_auditlog',
+               '#audit_list',
+               '#auditlog_loader');
+    }
+
+    function loadLicenseData(url_params){
+      loadDivData(license_url + url_params,
+                      '#data_license', '#license_loader');
+    }
+    function loadPolicyData(url_params){
+      loadTableData(policy_url + url_params,
+                      '#data_workload_policy','#policy_table', '#workload_policy_loader');
+    }
+
+    function checkLicenseValidity()
+    {		
+	     $("#license_loader").attr('style', 'display:block !important;');
+	      path= context_path + "/admin/workloads_admin/license/checkvalidity"
+              var get = $.get(path);
+              get.done(function( data ) {
+		   $("#license_loader").attr('style', 'display:none !important;');
+                   if(data.status == '200') {
+			$("#license_validity_error").html('<span class="label label-success">License is Valid!</span> '+data.data);
+			$("#license_validity_error").attr("style","color:green;")
+                        $("#license_validity_error").show();
+                        $("#license_update").html("Update License");
+                   }
+                   if(data.status == '500') {
+			$("#license_validity_error").html('<span class="label label-danger">License is Invalid!</span> '+data.reason);		
+			$("#license_validity_error").attr("style","color:red;")
+			$("#license_validity_error").show();
+                        if((data.reason).indexOf('License expired')!=-1)
+                         {
+                             $("#license_update").html("Renew License");
+			 }
+                        else if((data.reason).indexOf('Backup capacity exceeded')!=-1)
+                         {
+                             $("#license_update").html("Update License");
+                         }
+                        else
+                         {
+                             $("#license_update").html("Apply License");
+                         }
+
+                   }
+              });
+	
+    }
+
+    function loadProjectList(pid,list_id,parent_id){
+              path= context_path + "/admin/workloads_admin/workloads/projectList"
+              var get = $.get(path);
+              get.done(function( data ) {
+                     if(data.status == '200') {
+                          var options="";
+                          project_list= data.data;
+                          var tenantlist_html='<label for="'+list_id+'">Select Tenant</label>&nbsp;&nbsp;<select id="'+list_id+'" name="select_tenant" class="btn btn-default"><option value="">All Tenants</option>';
+                          for(var i=0;i<project_list.length;i++)
+                          {
+                              if(pid==project_list[i].id)
+                                  tenantlist_html+='<option value="'+project_list[i].id+'" selected="selected">'+project_list[i].name+'</option>';
+                              else
+                                 tenantlist_html+='<option value="'+project_list[i].id+'">'+project_list[i].name+'</option>';
+                          }
+                          $("#"+parent_id).html(tenantlist_html+'</select>');
+                     }
+                   });
+
+    }
+
+
+    function loadUsageData(){
+         $("#usage_loader").attr('style', 'display:block !important;');
+         path = context_path + '/admin/workloads_admin/usage_data/';
+         var get = $.get(path);
+         get.done(function( data ) {
+             $("#usage_loader").attr('style', 'display:none !important;');
+             if(data.status == '200') {
+               obj = data.data;
+               var htmlOutPut = '';
+               $.each(obj, function(key, val) {
+                    htmlOutPut = htmlOutPut + '<li class="tenant_tree" id="li_'+key+'">'+obj[key].tenant_name+'<span class="tree_font"> (Total Workloads: '+obj[key].no_of_workloads+', Virtual Machines : '+obj[key].vms_protected+', Size : '+obj[key].used_capacity+')</span>';
+                     var workloads_li = '<ul><li>No Data.</li></ul>';
+                     if(!$.isEmptyObject(obj[key].workloads))
+                     {
+                         workloads_li = '<ul><li>Workloads';
+                         $.each(obj[key].workloads, function(wlm_key,wlm_val) {
+                            var total_vm=0;
+                            if(!$.isEmptyObject(obj[key].workloads[wlm_key].protected_vms))
+                            {
+                                  $.each(obj[key].workloads[wlm_key].protected_vms, function(vm_key,vm_val) {
+                                       total_vm++;
+                                  });
+                            }
+                             workloads_li  = workloads_li+'<ul><li>'+obj[key].workloads[wlm_key].name+'<span class="tree_font"> (Virtual Machines :'+total_vm+', Size : '+obj[key].workloads[wlm_key].size+')</span>';
+                            if(!$.isEmptyObject(obj[key].workloads[wlm_key].snapshots))
+                            {  
+                               workloads_li  = workloads_li+'<ul><li>Snapshots';
+                               $.each(obj[key].workloads[wlm_key].snapshots, function(snap_key,snap_val) {
+                                   workloads_li = workloads_li+'<ul><li>'+obj[key].workloads[wlm_key].snapshots[snap_key].created_at+' - '+obj[key].workloads[wlm_key].snapshots[snap_key].name+'<span class="tree_font"> (Size: '+obj[key].workloads[wlm_key].snapshots[snap_key].size+')</span></li></ul>';
+                               });
+                               workloads_li  = workloads_li+'</li></ul>';//For snapshots end
+                            }
+                             if(!$.isEmptyObject(obj[key].workloads[wlm_key].protected_vms))
+                            {
+                               workloads_li  = workloads_li+'<ul><li>Protected VM\'s';
+                               $.each(obj[key].workloads[wlm_key].protected_vms, function(vm_key,vm_val) {
+                                   workloads_li = workloads_li+'<ul><li>'+obj[key].workloads[wlm_key].protected_vms[vm_key].name+'</li></ul>';
+                               });
+                               workloads_li  = workloads_li+'</li></ul>';//For VM's protected end
+                            }
+
+                            workloads_li  = workloads_li+'</li></ul>';//For workloads end                      
+                         });
+                     }
+                     htmlOutPut = htmlOutPut+''+workloads_li+'</li></ul>';
+
+               });
+               $("#usage_tree").html(htmlOutPut);
+               $('#usage_tree').treed();
+             }
+         });
+    }
+    
+    function loadDivData(url_link, div_id, loader_id){
+      $(div_id).attr('style', 'display:none !important;');
+      if(loader_id.length > 0)
+        $(loader_id).attr('style', 'display:block !important;');
+      $(div_id).load(url_link,
+        function(responseTxt, statusTxt, xhr){
+          if(statusTxt == "success"){
+            $(div_id).attr('style', 'display:block !important;');
+            if(loader_id.length > 0)
+              $(loader_id).attr('style', 'display:none !important;');
+            if(div_id == '#data_quota')   { updateQuotaSparks(); }
+            if(div_id == '#data_storage') { updateWorkloadsStorage(); }
+          }else{
+            $(div_id).attr('style', 'display:block !important;');
+            if(loader_id.length > 0)
+              $(loader_id).attr('style', 'display:none !important;');
+          }
+        }
+      );
+    }
+
+    function loadTableData(url_link, div_id, table_id, loader_id){
+      $(div_id).attr('style', 'display:none !important;');
+      if(loader_id.length > 0)
+        $(loader_id).attr('style', 'display:block !important;');
+      if(table_id == '#workload_list') {
+          bindDataTable(table_id);
+          $(div_id).attr('style', 'display:block !important;');
+          if(loader_id.length > 0)
+             $(loader_id).attr('style', 'display:none !important;');
+          updateWorkloadsSparks();
+      }
+      else 
+      {
+        $(div_id).load(url_link,
+          function(responseTxt, statusTxt, xhr){
+            if(statusTxt == "success"){
+              bindDataTable(table_id);
+              $(div_id).attr('style', 'display:block !important;');
+              if(loader_id.length > 0)
+                $(loader_id).attr('style', 'display:none !important;');
+              }else{
+              $(div_id).attr('style', 'display:block !important;');
+               if(loader_id.length > 0)
+                  $(loader_id).attr('style', 'display:none !important;');
+               }
+             }
+         );
+       }
+    }
+    var rows_selected = [];
+    function bindDataTable(table_id){
+      if(table_id == '#workload_list') {
+        rows_selected = [];
+        var tenant_id=sessionStorage.getItem("selected_tenant");
+        workloads_table=$(table_id).DataTable({
+            "dom":'<"wrapper">frtlip',
+            "columnDefs": [
+                { "visible": true, "targets": 2 },
+                { "targets": 0, "checkboxes": {"selectRow": true },'className': 'dt-body-center',
+                  'render': function (data, type, full, meta){
+                               return '<input type="checkbox" class="workload_check">';
+                            }
+                },
+                { className: "sortable normal_column user_width", "targets": [ 1 ] },
+                { className: "sortable normal_column user_width", "targets": [ 2 ] },
+                { className: "sortable normal_column", "targets": [ 3 ] },
+                { className: "sortable normal_column", "targets": [ 4 ] },
+                { className: "sortable normal_column type_zone", "targets": [ 5 ] },
+                { className: "sortable normal_column type_zone", "targets": [ 6 ] },
+                { className: "sortable normal_column perform_width", "targets": [ 7 ] },
+                { className: "sortable normal_column", "targets": [ 8 ] },
+                { className: "sortable normal_column", "targets": [ 9 ] },
+            ],
+            "select": {
+                                 'style': 'multi'
+                        },
+            "order": [[ 2, 'asc' ]],
+            "serverSide": true,
+            "ajax": {url: workloads_url,
+                    data: {"project_id":tenant_id}
+            },
+            "lengthMenu": [[10, 25, 50, 100,200,-1], [10, 25, 50,100,200,"All"]],
+            "paging": true,
+            "searching": false,
+            "destroy": true,
+            "oLanguage": {
+               "sInfoFiltered": ""
+            },
+            "processing":true,
+            "stateSave": true,
+            "drawCallback": function ( settings ) {
+             
+                var api = this.api();
+                var rows = api.rows( {page:'current'} ).nodes();
+                var last=null;
+                updateWorkloadsSparks();
+            },
+            "rowCallback": function(row, data, dataIndex){
+                 // Get row ID
+                 var rowId = data[0];
+
+                // If row ID is in the list of selected row IDs
+                if($.inArray(rowId, rows_selected) !== -1){
+                    $(row).find('input.workload_check[type="checkbox"]').prop('checked', true);
+               }
+      	    }
+        } );
+        $("div.wrapper").attr('style','padding-bottom:3%;');
+        $("div.wrapper").append('<div class="dt-buttons" id="wrapper_tenant_list" style="float:left !important;"></div><div style="float:right !important;" class="btn-group "><a class="btn btn-default btn-sm workload_table_action" disabled tabindex="0" aria-controls="workload_option" href="#" data-record-id="0#multiple_row#1" data-toggle="modal" data-target="#confirm-scheduler-update"><span>Enable Scheduler</span></a><a class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a><ul class="dropdown-menu dropdown-menu-right row_actions"><li><a class="btn workload_table_action" disabled tabindex="0" aria-controls="workload_option" href="#" data-record-id="0#multiple_row#0" data-toggle="modal" data-target="#confirm-scheduler-update"><span>Disable Scheduler</span></a></li></ul></div>');
+       loadProjectList(tenant_id,'tenant_list','wrapper_tenant_list');   
+       /***************For Multi Select**********************/
+// Handle click on checkbox
+   $('#workload_list tbody').on('click', 'input.workload_check[type="checkbox"]', function(e){
+      var $row = $(this).closest('tr');
+
+      // Get row data
+      var data = workloads_table.row($row).data();
+
+      // Get row ID
+      var rowId = data[0];
+
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, rows_selected);
+
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1){
+         rows_selected.push(rowId);
+
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1){
+         rows_selected.splice(index, 1);
+      }
+
+      //To enable disable table actions
+       if(rows_selected.length > 0)
+        $(".workload_table_action").removeAttr("disabled");
+      else
+        $(".workload_table_action").attr("disabled","disabled");
+
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(workloads_table);
+
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+
+   // Handle click on table cells with checkboxes
+   $('#workload_list').on('click', 'tbody td, thead th:first-child', function(e){
+      $(this).parent().find('input.workload_check[type="checkbox"]').trigger('click');
+   });
+
+   // Handle click on "Select all" control
+   $('thead input[type="checkbox"]', workloads_table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#workload_list tbody input.workload_check[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#workload_list tbody input.workload_check[type="checkbox"]:checked').trigger('click');
+      }
+
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+
+   // Handle table draw event
+   workloads_table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(workloads_table);
+   });
+
+        
+      }
+      else if (table_id == "#config_backup_table")
+      {
+		var table = $(table_id).DataTable({"order": [[ 0, "desc" ]]});
+                CheckProgressOfBackup();
+		// Add event listener for opening and closing details
+		$('#config_backup_table tbody').on('click', 'td.details-control', function () {
+	        var tr = $(this).closest('tr');
+        	var row = table.row( tr );
+		var $row_ele = $(this).closest('tr');
+	 	var rowId = $row_ele.attr('id');
+        	if ( row.child.isShown() ) {
+	            // This row is already open - close it
+        	    row.child.hide();
+	            tr.removeClass('shown');
+        	}
+	        else {
+        	    // Open child row
+		    path= context_path + "/admin/workloads_admin/config_backup/config_backup?"+rowId
+	            var get = $.get(path);
+        	    var child_row=""; var controller_table = "";
+	            get.done(function( data ) {
+        	         if(data.status == '200') {
+                	        backup_obj = data.metadata;
+                                main_obj = data.backup_data
+                                var controller_json=[];
+				if(backup_obj != null)
+				{
+				     child_row += '<div class="row"><div class="col-md-4"><h5><span class="label label-info">Time Taken </span>&nbsp;&nbsp; '+main_obj.time_taken+'</h5></div>'
+				     if(main_obj.status!="available")
+				     child_row += '<div class="col-md-8"><h5><span class="label label-danger">Error</span>&nbsp;&nbsp; '+main_obj.error_msg+'</h5></div>'
+				     child_row += '</div><div class="well"><div class="row"><div class="col-md-6"><h5><span class="label label-primary">Compute Nodes</span></h5>'
+                   		     child_row += '<div style="max-height:250px;overflow-y:auto;"><table class="table table-bordered"><th>Host</th><th>Backup Items</th><tbody>';
+		                     for (var prop in backup_obj) {
+                	                child_row+='<tr><td>'+prop+'</td>';
+                        	        if(backup_obj[prop] !=null || backup_obj[prop].length > 0)
+                                	{
+					    child_row+='<td><table>';
+        	                            for(var meta in backup_obj[prop])
+                	                        {
+						  if(meta.indexOf('config_data for remote node')!=-1)
+						  {
+							var controller_array={};
+							controller_array['controller_name'] = meta.split(":")[1];
+                                                        controller_array['status'] = backup_obj[prop][meta];
+							controller_array['compute_name'] = prop;
+						        controller_json.push(controller_array);
+						  }
+						  else
+						  {
+							if(backup_obj[prop][meta]!="Completed")
+	                        	                 child_row+='<tr><td>'+meta+' : <span class="label label-danger">Error</span> '+backup_obj[prop][meta]+'</td></tr>'
+							else
+							 child_row+='<tr><td>'+meta+' : '+backup_obj[prop][meta]+'</td></tr>'
+           					  }
+                                	        }
+						child_row+='</table>';
+        	                        }
+                	                child_row+='</td></tr>';
+                        	     }
+		                        child_row+='</tbody></table></div></div><div class="col-md-6">';
+					//Bind Controller node data
+					if(controller_json.length > 0)
+					{
+						controller_table += '<h5><span class="label label-primary">Controller Nodes</span></h5>'
+	                                        controller_table += '<table class="table table-bordered"><th>Controller</th><th>Compute</th><th>Backup Items</th><tbody>';
+						 for (var i=0;i<controller_json.length;i++) {
+        		                                controller_table+='<tr><td>'+controller_json[i].controller_name+'</td><td>'+controller_json[i].compute_name+'</td>';
+							controller_table+='<td>Config Data : '+controller_json[i].status+'</td></tr>';
+						 }
+						controller_table += '</tbody></table></div>';
+						child_row+=controller_table+'</div></div>';
+					}
+				}
+				else
+				{
+					child_row='<div class="well"><h5><span class="label label-danger">Error</span>&nbsp;&nbsp; '+main_obj.error_msg+'</h5></div>';
+				}
+				row.child(child_row).show();
+		                tr.addClass('shown');
+                	   }
+	                if(data.status == '500') {
+				child_row="<div class='well'><span>No Data Found.</span></div>";
+				row.child(child_row).show();
+                        	tr.addClass('shown');
+                   	}
+              	  });
+        	 }
+		});		
+
+
+	}
+      else{
+        $(table_id).DataTable();
+      }
+      $(table_id).attr('style', 'width:100% !important;');
+      $('[name="' + table_id + '_length"]')
+         .attr('style', 'width:75px; display:inline !important;');
+      $(table_id + '_filter input')
+         .attr('style', 'display:inline !important;');
+      $(".dataTables_length").find("label").attr(
+                           'style', 'display:inline-flex;  margin-top:10px;margin-bottom: 14px;');
+      $(".dataTables_length").find("label").find("Select").attr(
+                           'style',  'width: 75px; margin: -5px 6px 0px 6px;');
+      $(".dataTables_filter").find("label").attr(
+                           'style', 'margin-top: 5px; margin-bottom: 0px;');
+    }
+
+    function updateQuotaSparks(){
+      $('.sparkline_tvault').sparkline('html',
+        { type: 'pie',
+          width: '95',
+          height: '95',
+          offset: -90,
+          borderWidth: 1.5,
+          borderColor: '#CCCCCC',
+          disableTooltips: 1,
+          sliceColors: ['#006CCF', '#F2F2F2', '#424242']} );
+    }
+
+    function updateWorkloadsSparks(){
+      $('.sparkline_performance').each(function() {
+        var values_bar = JSON.parse($(this).attr('data-values-bar'));
+        var values_line = JSON.parse($(this).attr('data-values-line'));
+        var tooltips_line = JSON.parse(
+              $(this).attr("data-tooltips-line").replace(/'/g, '"').replace(/u"/g, '"'));
+        var tooltips_bar = JSON.parse(
+              $(this).attr("data-tooltips-bar").replace(/'/g, '"').replace(/u"/g, '"'));
+        var tooltip_format =  '<span style="color: test">&#9679;</span> {% templatetag openvariable %}' +
+                              'offset:tooltips' +
+                              '{% templatetag closevariable %}'
+
+        $(this).sparkline(values_bar, { type: 'bar', barColor: 'green', fillColor: 'transparent', width: '100', height: '40', 
+                                  tooltipFormat: tooltip_format.replace("test", "green"),tooltipValueLookups: {'tooltips': tooltips_bar}});
+        $(this).sparkline(values_line, {
+          type: 'line',
+          width: '100',
+          barWidth: 5,
+          height: '40',
+          fillColor: 'transparent',
+          //colorMap: colors,
+          lineColor: 'red',
+          tooltipValueLookups: {'tooltips': tooltips_line},
+          tooltipFormat: tooltip_format.replace("test", "red"),
+          composite: true,
+         });
+      });
+
+      $('.sparkline_bar')
+            .sparkline('html', {type: 'pie', barColor: 'green'});
+
+      //loadQuotaData('');
+
+    }
+
+    function updateWorkloadsStorage(){
+      updateCumulativeStats();
+      //updateStorageChart('storage_usage_chart', 'data-storage');
+      //updateStorageChart('snaps_count_chart', 'data-snaps');
+      bindDataTable('#nfs_shares_table');
+    }
+    function updateCumulativeStats(){
+      $('.sparkline_storage').sparkline('html',
+        { type: 'pie',
+          width: '95',
+          height: '95',
+          offset: -90,
+          borderWidth: 2,
+          borderColor: '#CCCCCC',
+          sliceColors: ['#006CCF', '#F2F2F2', '#424242']} );
+
+      // EASY PIE CHARTS
+      $('.percentage').easyPieChart({
+        animate: 1000,
+        lineWidth: 4
+      });
+    }
+    function updateStorageChart(chart_div, chart_data){
+/*    // sample data to populate the jqplot chart
+      values = [ [[2,"workload 1", "2 MB"], [4,"workload 2", "4 MB"],
+                   [6,"workload 3", "6 MB"], [3,"workload 4", "3 MB"]],
+                 [[5,"workload 1", "5 MB"], [1,"workload 2", "1 MB"],
+                   [3,"workload 3", "3 MB"], [4,"workload 4", "4 MB"]]	];
+*/
+      var storage;
+      if ($('#' + chart_div).attr(chart_data).length > 0) {
+        storage = JSON.parse(
+            $('#' + chart_div).attr(chart_data).replace(/'/g, '"').replace(/u"/g, '"'));
+      }else{
+        storage = []
+      }
+      storage_values = [];
+      workload_full_values = [];
+      workload_incr_values = [];
+      for(i = 0; i < storage.length; i++){
+        full_values = [];
+        full_values.push(Number(storage[i].full));
+        full_values.push(storage[i].name);
+        full_values.push(storage[i].full_label);
+        workload_full_values.push(full_values);
+        incr_values = [];
+        incr_values.push(Number(storage[i].incremental));
+        incr_values.push(storage[i].name);
+        incr_values.push(storage[i].incr_label);
+        workload_incr_values.push(incr_values);
+      }
+      storage_values.push(workload_full_values);
+      storage_values.push(workload_incr_values);
+
+      total_workloads = workload_full_values.length;
+      if(total_workloads > 0){
+        $('#' + chart_div).attr(
+              'style', 'width:600px; height:' + (total_workloads * 75) + 'px;');
+        plot2b = $.jqplot(chart_div, 	storage_values, {
+          seriesDefaults: {
+              renderer:$.jqplot.BarRenderer,
+              pointLabels: { show: true,
+                         location: 'e',
+                         edgeTolerance: -15,
+                      },
+              shadowAngle: 135,
+              rendererOptions: {
+                  barDirection: 'horizontal'
+              }
+          },
+          series:[{label:'full'}, {label:'incremental'}, {label:'both'}],
+          legend: { show: true,
+              location: 'ne',
+              placement: 'outsideGrid',
+          },
+          grid: { drawGridLines: false
+          },
+          axes: {
+            yaxis: {
+              renderer: $.jqplot.CategoryAxisRenderer,
+              label: 'Workloads',
+              labelOptions: {
+                show: false,
+                fontSize: '8pt'
+              },
+              tickOptions: {
+                  show: true
+              },
+            },
+            xaxis: {
+              labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+              label: 'Storage',
+              labelOptions: {
+                show: false,
+                position: 'relative',
+                top: '50px',
+                fontSize: '8pt'
+              },
+              tickOptions: {
+                show: false
+              }
+            }
+          },
+        });
+      }else{
+        $('#' + chart_div).html('No data found.');
+      }
+    }
+
+function CheckProgressOfBackup()
+{
+	  var processingItems = processingItemArr; 
+          for(var i=0;i<processingItems.length;i++)
+  	  {
+		$("#config_backup_manual_create").addClass("disabled");
+		var backup_id=processingItems[i];
+		setTimeout(getCreateBackupStatus.bind(null, backup_id), 4000);
+	  } 
+	
+}
+
+function getCreateBackupStatus(backup_id) {
+              path= context_path + "/admin/workloads_admin/config_backup/config_backup?"+backup_id
+              var get = $.get(path);
+              get.done(function( data ) {
+                   if(data.status == '200') {
+                      backup_obj = data.backup_data;
+                      if(backup_obj.status != 'available' && backup_obj.status != 'error') {
+                               if(isConfigBackupTab==1)  
+				setTimeout(getCreateBackupStatus.bind(null, backup_obj.id), 4000);
+                        }
+			else
+                        {
+				$("#config_backup_manual_create").removeClass("disabled");
+                                loadConfigBackup('');
+                        }
+                   }
+                   if(data.status == '500') {
+                         loadConfigBackup('');
+                   }
+              });
+}
+function schedulerStatusChange(ele)
+{
+        rows_selected=[];
+        var id= ele[0].id;
+        var rowId = id.split('_')[1];
+        rows_selected.push(rowId);
+        if($("#"+id).prop("checked"))
+        {   
+            workload_scheduler_setting(1);
+	    $("#"+id).prop("checked",true)
+        }
+        else
+        {
+            workload_scheduler_setting(0);
+            $("#"+id).prop("checked",false)
+        }
+}
+
+// Updates "Select all" control in a data table
+//
+function updateDataTableSelectAllCtrl(table){
+   var $table             = table.table().node();
+   var $chkbox_all        = $('tbody input.workload_check[type="checkbox"]', $table);
+   var $chkbox_checked    = $('tbody input.workload_check[type="checkbox"]:checked', $table);
+   var chkbox_select_all  = $('thead input[type="checkbox"]', $table).get(0);
+
+   // If none of the checkboxes are checked
+   if($chkbox_checked.length === 0){
+      chkbox_select_all.checked = false;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+
+   // If all of the checkboxes are checked
+   } else if ($chkbox_checked.length === $chkbox_all.length){
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+
+   // If some of the checkboxes are checked
+   } else {
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = true;
+      }
+   }
+}
+
+//Workload scheduler settings from workloads tab
+function workload_scheduler_setting(flag)
+{
+  var selected_workloads = [];
+  $.each(rows_selected, function(index, rowId){
+        selected_workloads.push(rowId)
+  });
+  if(selected_workloads.length > 0)
+  {
+      $("#workloads_loader").attr('style', 'display:block !important;');
+      var url= context_path + "/admin/workloads_admin/workloads/workloadschedulersetting";
+      var data;
+      if(flag==1)
+          data = {"enable":'True',"workloads":JSON.stringify(selected_workloads)};
+      else
+          data = {"enable":'False',"workloads":JSON.stringify(selected_workloads)};
+      $.ajax({
+         type: 'POST',
+         url: url,
+         data:data,
+         async:false,
+         beforeSend: function(xhr) {
+         	xhr.setRequestHeader("X-CSRFToken", readCookie('csrftoken'));
+         },
+        success: function (data) {
+           $("#workloads_loader").attr('style', 'display:none !important;');
+           if(data.status == '200') {
+                $("#workloads_msg").html('Scheduler updated Successfully!');
+                $("#workloads_msg").attr("style","color:green;")
+                $("#workloads_msg").show();
+                setTimeout(function(){$("#workloads_msg").hide()},10000);
+           }
+           if(data.status == '500') {
+                $("#workloads_msg").html('Error: '+data.reason);
+                $("#workloads_msg").attr("style","color:red;")
+                $("#workloads_msg").show();
+                setTimeout(function(){$("#workloads_msg").hide()},15000);
+           }
+           workloads_table.ajax.reload();
+        },
+        error: function (xhr, ajaxOptions, errorThrown) {
+           $("#workloads_loader").attr('style', 'display:none !important;');
+           $("#workloads_msg").html('Error: '+data.reason);
+           $("#workloads_msg").attr("style","color:red;")
+           $("#workloads_msg").show();
+           setTimeout(function(){$("#workloads_msg").hide()},15000);
+           workloads_table.ajax.reload();
+        }
+        });
+  }
+}
+function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
+    //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+    var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+    
+    var CSV = '';    
+    //Set Report title in first row or line
+    
+    CSV += ReportTitle + '\r\n\n';
+
+    //This condition will generate the Label/Header
+    if (ShowLabel) {
+        var row = "";
+        
+        //This loop will extract the label from 1st index of on array
+        for (var index in arrData[0]) {
+            
+            //Now convert each value to string and comma-seprated
+            row += index + ',';
+        }
+
+        row = row.slice(0, -1);
+        
+        //append Label row with line break
+        CSV += row + '\r\n';
+    }
+    
+    //1st loop is to extract each row
+    for (var i = 0; i < arrData.length; i++) {
+        var row = "";
+        
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i]) {
+            row += '"' + arrData[i][index] + '",';
+        }
+
+        row.slice(0, row.length - 1);
+        
+        //add a line break after each row
+        CSV += row + '\r\n';
+    }
+
+    if (CSV == '') {        
+        return;
+    }   
+    else
+    {
+       var row = "";
+       row += '\r\n\nSummary\r\n'; 
+       row += '"Storage","'+$("#summary_storage").html()+'"\r\n';
+       row.slice(0, row.length - 1);
+       row += '"VMs","'+$("#summary_vms").html()+'"\r\n';
+       row.slice(0, row.length - 1);
+       CSV += row + '\r\n';
+    }
+    
+    //Generate a file name
+    var fileName = "TvaultChargeback";
+    //Initialize file format you want csv or xls
+    var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+    
+    // Now the little tricky part.
+    // you can use either>> window.open(uri);
+    // but this will not work in some browsers
+    // or you will not get the correct file extension    
+    
+    //this trick will generate a temp <a /> tag
+    var link = document.createElement("a");    
+    link.href = uri;
+    
+    //set the visibility hidden so it will not effect on your web-layout
+    link.style = "visibility:hidden";
+    link.download = fileName + ".csv";
+    
+    //this part will append the anchor tag and remove it after automatic click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+ </script>
+{% endblock %}
