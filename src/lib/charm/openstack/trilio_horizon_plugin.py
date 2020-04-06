@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import collections
-import glob
 import os
-import shutil
 import subprocess
 
 import charmhelpers.core.hookenv as hookenv
@@ -40,6 +38,7 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
     package_codenames = {
         "tvault-horizon-plugin": collections.OrderedDict([("3", "stein")]),
         "python3-horizon-plugin": collections.OrderedDict([("3", "stein")]),
+        "python3-horizon-plugin": collections.OrderedDict([("4", "train")]),
     }
 
     def configure_source(self):
@@ -55,40 +54,18 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
             return ["python-workloadmgrclient", "tvault-horizon-plugin"]
         return ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"]
 
-    # TODO: drop once packaging is updated
+    @property
+    def version_package(self):
+        return self.packages[-1]
+    
     def install(self):
         self.configure_source()
         super().install()
-        self.copy_files()
         self.collectstatic_and_compress()
 
-    # TODO: drop once packaging is updated
     def upgrade_charm(self):
         super().upgrade_charm()
-        self.copy_files()
         self.collectstatic_and_compress()
-
-    # TODO: drop when package does this
-    def copy_files(self):
-        for panel in glob.glob("files/trilio/panels/*"):
-            shutil.copy(
-                panel,
-                os.path.join(
-                    HORIZON_PATH, "openstack_dashboard/local/enabled"
-                ),
-            )
-        for templatetag in glob.glob("files/trilio/templatetags/*"):
-            shutil.copy(
-                templatetag,
-                os.path.join(HORIZON_PATH, "openstack_dashboard/templatetags"),
-            )
-        for index_html in glob.glob(
-            "/usr/lib/python*/**/workloads_admin/index.html", recursive=True
-        ):
-            shutil.copy(
-                "files/trilio/templates/workload_admin/index.html",
-                index_html,
-            )
 
     # TODO: drop when package does this
     def collectstatic_and_compress(self):
