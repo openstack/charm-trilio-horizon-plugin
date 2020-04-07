@@ -14,7 +14,6 @@
 
 import collections
 import os
-import subprocess
 
 import charmhelpers.core.hookenv as hookenv
 import charmhelpers.fetch as fetch
@@ -37,8 +36,10 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
 
     package_codenames = {
         "tvault-horizon-plugin": collections.OrderedDict([("3", "stein")]),
-        "python3-horizon-plugin": collections.OrderedDict([("3", "stein")]),
-        "python3-horizon-plugin": collections.OrderedDict([("4", "train")]),
+        "python3-horizon-plugin": collections.OrderedDict([
+            ("3", "stein"),
+            ("4", "train"),
+        ]),
     }
 
     def configure_source(self):
@@ -57,18 +58,10 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
     @property
     def version_package(self):
         return self.packages[-1]
-    
+
     def install(self):
         self.configure_source()
         super().install()
-        self.collectstatic_and_compress()
 
     def upgrade_charm(self):
         super().upgrade_charm()
-        self.collectstatic_and_compress()
-
-    # TODO: drop when package does this
-    def collectstatic_and_compress(self):
-        python = "/usr/bin/python{}".format(hookenv.config("python-version"))
-        subprocess.check_call([python, MANAGE_PY, "collectstatic", "--noinput"])
-        subprocess.check_call([python, MANAGE_PY, "compress", "--force"])
