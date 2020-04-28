@@ -24,19 +24,15 @@ class Helper(test_utils.PatchHelper):
 
 
 class TestTrilioHorizonCharm(Helper):
-    def test_packages_py2(self):
-        dm_charm = trilio_horizon.TrilioHorizonPluginCharm()
-        self.patch_object(trilio_horizon.hookenv, "config")
-        self.config.return_value = 2
+    def test_packages_queens(self):
+        dm_charm = trilio_horizon.TrilioHorizonPluginQueensCharm()
         self.assertEqual(
             dm_charm.packages,
             ["python-workloadmgrclient", "tvault-horizon-plugin"],
         )
 
-    def test_packages_py3(self):
+    def test_packages_rocky(self):
         dm_charm = trilio_horizon.TrilioHorizonPluginCharm()
-        self.patch_object(trilio_horizon.hookenv, "config")
-        self.config.return_value = 3
         self.assertEqual(
             dm_charm.packages,
             ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"],

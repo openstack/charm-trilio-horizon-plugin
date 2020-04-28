@@ -25,22 +25,26 @@ HORIZON_PATH = "/usr/share/openstack-dashboard"
 MANAGE_PY = os.path.join(HORIZON_PATH, "manage.py")
 
 
-class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
+class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
 
     service_name = name = "trilio-horizon-plugin"
 
-    # First release supported
-    release = "stein"
+    release = "queens"
 
     required_relations = []
 
     package_codenames = {
-        "tvault-horizon-plugin": collections.OrderedDict([("3", "stein")]),
+        "tvault-horizon-plugin": collections.OrderedDict([
+            ("3", "stein"),
+            ("4", "train"),
+        ]),
         "python3-horizon-plugin": collections.OrderedDict([
             ("3", "stein"),
             ("4", "train"),
         ]),
     }
+
+    packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
 
     def configure_source(self):
         with open(
@@ -48,12 +52,6 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
         ) as tsources:
             tsources.write(hookenv.config("triliovault-pkg-source"))
         fetch.apt_update(fatal=True)
-
-    @property
-    def packages(self):
-        if hookenv.config("python-version") == 2:
-            return ["python-workloadmgrclient", "tvault-horizon-plugin"]
-        return ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"]
 
     @property
     def version_package(self):
@@ -65,3 +63,10 @@ class TrilioHorizonPluginCharm(charms_openstack.charm.OpenStackCharm):
 
     def upgrade_charm(self):
         super().upgrade_charm()
+
+
+class TrilioHorizonPluginCharm(TrilioHorizonPluginQueensCharm):
+
+    release = "rocky"
+
+    packages = ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"]
