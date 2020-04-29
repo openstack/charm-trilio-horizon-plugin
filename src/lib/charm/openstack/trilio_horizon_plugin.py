@@ -33,18 +33,19 @@ class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
 
     required_relations = []
 
+    packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
+
+    release_pkg = "openstack-dashboard"
+
     package_codenames = {
-        "tvault-horizon-plugin": collections.OrderedDict([
-            ("3", "stein"),
-            ("4", "train"),
-        ]),
-        "python3-horizon-plugin": collections.OrderedDict([
-            ("3", "stein"),
-            ("4", "train"),
+        "openstack-dashboard": collections.OrderedDict([
+            ("13", "queens"),
+            ("14", "rocky"),
+            ("15", "stein"),
+            ("16", "train"),
+            ("18", "ussuri"),
         ]),
     }
-
-    packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
 
     def configure_source(self):
         with open(
