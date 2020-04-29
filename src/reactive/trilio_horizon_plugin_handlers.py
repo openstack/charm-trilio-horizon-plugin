@@ -16,4 +16,8 @@ import charms_openstack.charm as charm
 # trilio_horizon_plugin
 import charm.openstack.trilio_horizon_plugin as trilio_horizon_plugin  # noqa
 
-charm.use_defaults("charm.installed", "config.changed", "update-status")
+charm.use_defaults(
+    "charm.installed",
+    "config.changed",
+    "update-status"
+)

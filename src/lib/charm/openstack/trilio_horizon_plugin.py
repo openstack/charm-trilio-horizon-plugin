@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
 import os
 
 import charmhelpers.core.hookenv as hookenv
@@ -20,6 +19,8 @@ import charmhelpers.fetch as fetch
 
 import charms_openstack.charm
 
+# select the default release function
+charms_openstack.charm.use_defaults('charm.default-select-release')
 
 HORIZON_PATH = "/usr/share/openstack-dashboard"
 MANAGE_PY = os.path.join(HORIZON_PATH, "manage.py")
@@ -34,18 +35,6 @@ class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
     required_relations = []
 
     packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
-
-    release_pkg = "openstack-dashboard"
-
-    package_codenames = {
-        "openstack-dashboard": collections.OrderedDict([
-            ("13", "queens"),
-            ("14", "rocky"),
-            ("15", "stein"),
-            ("16", "train"),
-            ("18", "ussuri"),
-        ]),
-    }
 
     def configure_source(self):
         with open(
