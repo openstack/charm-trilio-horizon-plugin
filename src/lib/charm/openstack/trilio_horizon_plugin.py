@@ -36,6 +36,10 @@ class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
 
     packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
 
+    # Setting an empty source_config_key activates special handling of release
+    # selection suitable for subordinate charms
+    source_config_key = ''
+
     def configure_source(self):
         with open(
             "/etc/apt/sources.list.d/" "trilio-gemfury-sources.list", "w"
