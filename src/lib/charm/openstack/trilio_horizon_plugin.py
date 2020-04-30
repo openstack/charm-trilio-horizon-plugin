@@ -15,6 +15,7 @@
 import os
 
 import charmhelpers.core.hookenv as hookenv
+import charmhelpers.contrib.openstack.utils as os_utils
 import charmhelpers.fetch as fetch
 
 import charms_openstack.charm
@@ -39,6 +40,10 @@ class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
     # Setting an empty source_config_key activates special handling of release
     # selection suitable for subordinate charms
     source_config_key = ''
+
+    # Use openstack-dashboard package to drive OpenStack Release versioning.
+    release_pkg = "openstack-dashboard"
+    package_codenames = os_utils.PACKAGE_CODENAMES
 
     def configure_source(self):
         with open(
