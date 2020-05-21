@@ -11,6 +11,7 @@
 # limitations under the License.
 
 import charms_openstack.charm as charm
+import charms.reactive as reactive
 
 # This charm's library contains all of the handler code associated with
 # trilio_horizon_plugin
@@ -21,3 +22,9 @@ charm.use_defaults(
     "config.changed",
     "update-status"
 )
+
+
+@reactive.when("config.changed.triliovault-pkg-source")
+def install_source_changed():
+    """Trigger re-install of charm if source configuration options change"""
+    reactive.clear_flag("charm.installed")

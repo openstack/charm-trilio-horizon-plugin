@@ -97,7 +97,11 @@ class TestDmapiHandlers(test_utils.PatchHelper):
         # test that the hooks actually registered the relation expressions that
         # are meaningful for this interface: this is to handle regressions.
         # The keys are the function names that the hook attaches to.
-        when_patterns = {}
+        when_patterns = {
+            "install_source_changed": (
+                "config.changed.triliovault-pkg-source",
+            )
+        }
         when_not_patterns = {}
         # check the when hooks are attached to the expected functions
         for t, p in [
