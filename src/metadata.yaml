@@ -9,13 +9,14 @@ description: |
   This charm provides the TrilioVault Horizon plugin for use with the
   OpenStack Dashboard as part of the TrilioVault solution.
 tags:
-  - openstack
-  - storage
-  - backup
+- openstack
+- storage
+- backup
 subordinate: true
 series:
-  - xenial
-  - bionic
+- xenial
+- bionic
+- groovy
 requires:
   dashboard-plugin:
     interface: dashboard-plugin
