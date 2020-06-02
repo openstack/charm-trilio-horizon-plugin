@@ -14,11 +14,10 @@
 
 import os
 
-import charmhelpers.core.hookenv as hookenv
 import charmhelpers.contrib.openstack.utils as os_utils
-import charmhelpers.fetch as fetch
 
 import charms_openstack.charm
+import charms_openstack.plugins
 
 # select the default release function
 charms_openstack.charm.use_defaults('charm.default-select-release')
@@ -27,7 +26,9 @@ HORIZON_PATH = "/usr/share/openstack-dashboard"
 MANAGE_PY = os.path.join(HORIZON_PATH, "manage.py")
 
 
-class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
+class TrilioHorizonPluginQueensCharm(
+    charms_openstack.plugins.TrilioVaultSubordinateCharm
+):
 
     service_name = name = "trilio-horizon-plugin"
 
@@ -45,23 +46,9 @@ class TrilioHorizonPluginQueensCharm(charms_openstack.charm.OpenStackCharm):
     release_pkg = "openstack-dashboard"
     package_codenames = os_utils.PACKAGE_CODENAMES
 
-    def configure_source(self):
-        with open(
-            "/etc/apt/sources.list.d/" "trilio-gemfury-sources.list", "w"
-        ) as tsources:
-            tsources.write(hookenv.config("triliovault-pkg-source"))
-        fetch.apt_update(fatal=True)
-
     @property
     def version_package(self):
         return self.packages[-1]
-
-    def install(self):
-        self.configure_source()
-        super().install()
-
-    def upgrade_charm(self):
-        super().upgrade_charm()
 
 
 class TrilioHorizonPluginCharm(TrilioHorizonPluginQueensCharm):
