@@ -16,7 +16,6 @@ subordinate: true
 series:
 - xenial
 - bionic
-- groovy
 requires:
   dashboard-plugin:
     interface: dashboard-plugin
