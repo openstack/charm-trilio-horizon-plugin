@@ -16,6 +16,8 @@ subordinate: true
 series:
 - xenial
 - bionic
+- focal
+- groovy
 requires:
   dashboard-plugin:
     interface: dashboard-plugin
