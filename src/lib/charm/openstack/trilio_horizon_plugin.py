@@ -19,8 +19,7 @@ import charmhelpers.contrib.openstack.utils as os_utils
 import charms_openstack.charm
 import charms_openstack.plugins
 
-# select the default release function
-charms_openstack.charm.use_defaults('charm.default-select-release')
+charms_openstack.plugins.trilio.make_trilio_handlers()
 
 HORIZON_PATH = "/usr/share/openstack-dashboard"
 MANAGE_PY = os.path.join(HORIZON_PATH, "manage.py")
@@ -33,6 +32,7 @@ class TrilioHorizonPluginQueensCharm(
     service_name = name = "trilio-horizon-plugin"
 
     release = "queens"
+    trilio_release = "4.0"
 
     required_relations = []
 
@@ -43,16 +43,21 @@ class TrilioHorizonPluginQueensCharm(
     source_config_key = ''
 
     # Use openstack-dashboard package to drive OpenStack Release versioning.
-    release_pkg = "openstack-dashboard"
+    os_release_pkg = "openstack-dashboard"
     package_codenames = os_utils.PACKAGE_CODENAMES
 
-    @property
-    def version_package(self):
-        return self.packages[-1]
+    @classmethod
+    def trilio_version_package(cls):
+        return 'tvault-horizon-plugin'
 
 
 class TrilioHorizonPluginCharm(TrilioHorizonPluginQueensCharm):
 
     release = "rocky"
+    trilio_release = "4.0"
 
     packages = ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"]
+
+    @classmethod
+    def trilio_version_package(cls):
+        return 'python3-tvault-horizon-plugin'
