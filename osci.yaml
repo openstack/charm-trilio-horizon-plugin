@@ -1,17 +1,23 @@
 - project:
     templates:
-      - charm-unit-jobs
+      - charm-yoga-unit-jobs
     check:
       jobs:
       - charm-build
       - bionic-queens-40_trilio-horizon
       - bionic-stein-40_trilio-horizon
-      - bionic-train-40_trilio-horizon
       - bionic-queens-41_trilio-horizon
       - bionic-stein-41_trilio-horizon
-      - bionic-train-41_trilio-horizon
-      - bionic-ussuri-41_trilio-horizon
-      - focal-ussuri-41_trilio-horizon
+      # Non-voting due to:
+      # https://bugs.launchpad.net/charm-trilio-data-mover/+bug/1951999
+      - bionic-train-40_trilio-horizon:
+          voting: false
+      - bionic-train-41_trilio-horizon:
+          voting: false
+      - bionic-ussuri-41_trilio-horizon:
+          voting: false
+      - focal-ussuri-41_trilio-horizon:
+          voting: false
     vars:
       needs_charm_build: true
       charm_build_name: trilio-horizon-plugin
@@ -20,10 +26,9 @@
     parent: func-target
     dependencies:
       - osci-lint
-      - tox-py35
       - tox-py36
-      - tox-py37
       - tox-py38
+      - tox-py39
     vars:
       tox_extra_args: bionic-train-40
 - job:
