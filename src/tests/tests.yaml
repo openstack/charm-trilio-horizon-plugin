@@ -4,6 +4,7 @@ tests:
 configure:
   - zaza.openstack.charm_tests.trilio.setup.basic_setup
   - zaza.openstack.charm_tests.vault.setup.auto_initialize
+  - zaza.openstack.charm_tests.trilio.setup.restart_tvault_contego
   - zaza.openstack.charm_tests.glance.setup.add_cirros_image
   - zaza.openstack.charm_tests.glance.setup.add_lts_image
   - zaza.openstack.charm_tests.neutron.setup.basic_overcloud_network
@@ -39,6 +40,7 @@ target_deploy_status:
   trilio-data-mover:
     workload-status: blocked
     workload-status-message: "nfs-shares configuration not set"
+    workload-status-message-regex: "^.*configuration not set|Unit is ready|Services not running that should be: tvault-contego"
   glance:
     workload-status: waiting
     workload-status-message: "Incomplete relations: storage-backend"
