@@ -7,7 +7,7 @@ variables:
   vault-charm-channel: &vault-charm-channel '1.7/edge'
   trilio-charm-channel: &trilio-charm-channel 'latest/stable'
   trilio-openstack-origin: &trilio-openstack-origin 'cloud:bionic-stein'
-  triliovault-pkg-source: &triliovault-pkg-source 'deb [trusted=yes] https://apt.fury.io/triliodata-4-0/ /'
+  triliovault-pkg-source: &triliovault-pkg-source 'deb [trusted=yes] https://apt.fury.io/triliodata-4-2/ /'
 
 series: &series bionic
 
