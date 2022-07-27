@@ -10,6 +10,7 @@
       - bionic-ussuri-42_trilio-horizon
       - focal-ussuri-41_trilio-horizon
       - focal-ussuri-42_trilio-horizon
+      - focal-wallaby-42_trilio-horizon
     vars:
       needs_charm_build: true
       charm_build_name: trilio-horizon-plugin
@@ -52,3 +53,10 @@
       - bionic-queens-42_trilio-horizon
     vars:
       tox_extra_args: bionic-queens-41
+- job:
+    name: focal-wallaby-42_trilio-horizon
+    parent: func-target
+    dependencies:
+      - focal-ussuri-42_trilio-horizon
+    vars:
+      tox_extra_args: focal-wallaby-42
