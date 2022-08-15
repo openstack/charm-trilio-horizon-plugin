@@ -1,6 +1,6 @@
 charm_name: trilio-horizon-plugin
 tests:
-  - zaza.charm_tests.noop.tests.NoopTest
+  - zaza.openstack.charm_tests.trilio.tests.TrilioHorizonPluginTest
 configure:
   - zaza.openstack.charm_tests.trilio.setup.basic_setup
   - zaza.openstack.charm_tests.vault.setup.auto_initialize

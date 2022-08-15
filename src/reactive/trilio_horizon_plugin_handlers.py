@@ -29,3 +29,18 @@ def install_source_changed():
     """Trigger re-install of charm if source configuration options change"""
     reactive.clear_flag("charm.installed")
     reactive.set_flag("upgrade.triliovault")
+
+
+@reactive.when_not('is-update-status-hook')
+@reactive.when('dashboard-plugin.available')
+def dashboard_available():
+    """Relation to OpenStack Dashboard principal charm complete.
+    """
+    with charm.provide_charm_instance() as charm_instance:
+        dashboard_relation = reactive.endpoint_from_flag(
+            'dashboard-plugin.available')
+        dashboard_relation.publish_plugin_info(
+            charm_instance.local_settings(),
+            1,
+            conflicting_packages=[],
+            install_packages=[])

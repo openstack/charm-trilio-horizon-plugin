@@ -25,18 +25,14 @@ HORIZON_PATH = "/usr/share/openstack-dashboard"
 MANAGE_PY = os.path.join(HORIZON_PATH, "manage.py")
 
 
-class TrilioHorizonPluginQueensCharm(
+class TrilioHorizonPluginBase(
     charms_openstack.plugins.TrilioVaultSubordinateCharm
 ):
 
+    abstract_class = True
+
     service_name = name = "trilio-horizon-plugin"
-
-    release = "queens"
-    trilio_release = "4.0"
-
     required_relations = []
-
-    packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
 
     # Setting an empty source_config_key activates special handling of release
     # selection suitable for subordinate charms
@@ -48,16 +44,46 @@ class TrilioHorizonPluginQueensCharm(
 
     @classmethod
     def trilio_version_package(cls):
-        return 'tvault-horizon-plugin'
+        return 'python3-tvault-horizon-plugin'
+
+    def trilio_encryption_supported(self):
+        return False
+
+    def local_settings(self):
+        settings = (
+            "TRILIO_ENCRYPTION_SUPPORT = {}\n"
+            "OPENSTACK_ENCRYPTION_SUPPORT = {}").format(
+                self.trilio_encryption_supported(),
+                self.config['openstack-encryption-support'])
+        return settings
 
 
-class TrilioHorizonPluginCharm(TrilioHorizonPluginQueensCharm):
+class TrilioHorizonPluginCharmQueens41(TrilioHorizonPluginBase):
+
+    release = "queens"
+    trilio_release = "4.1"
+    packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
+
+
+class TrilioHorizonPluginCharmQueens42(TrilioHorizonPluginBase):
+
+    release = "queens"
+    trilio_release = "4.2"
+    packages = ["python-workloadmgrclient", "tvault-horizon-plugin"]
+
+    def trilio_encryption_supported(self):
+        return True
+
+
+class TrilioHorizonPluginCharmRocky41(TrilioHorizonPluginCharmQueens41):
 
     release = "rocky"
-    trilio_release = "4.0"
-
+    trilio_release = "4.1"
     packages = ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"]
 
-    @classmethod
-    def trilio_version_package(cls):
-        return 'python3-tvault-horizon-plugin'
+
+class TrilioHorizonPluginCharmRocky42(TrilioHorizonPluginCharmQueens42):
+
+    release = "rocky"
+    trilio_release = "4.2"
+    packages = ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"]

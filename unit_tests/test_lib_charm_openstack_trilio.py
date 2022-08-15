@@ -20,19 +20,23 @@ import charms_openstack.test_utils as test_utils
 class Helper(test_utils.PatchHelper):
     def setUp(self):
         super().setUp()
-        self.patch_release(trilio_horizon.TrilioHorizonPluginCharm.release)
+        self.patch_release(
+            trilio_horizon.TrilioHorizonPluginCharmQueens42.release)
+        self.patch_release(
+            trilio_horizon.TrilioHorizonPluginCharmRocky42.release)
 
 
 class TestTrilioHorizonCharm(Helper):
+
     def test_packages_queens(self):
-        dm_charm = trilio_horizon.TrilioHorizonPluginQueensCharm()
+        dm_charm = trilio_horizon.TrilioHorizonPluginCharmQueens42()
         self.assertEqual(
             dm_charm.packages,
             ["python-workloadmgrclient", "tvault-horizon-plugin"],
         )
 
     def test_packages_rocky(self):
-        dm_charm = trilio_horizon.TrilioHorizonPluginCharm()
+        dm_charm = trilio_horizon.TrilioHorizonPluginCharmRocky42()
         self.assertEqual(
             dm_charm.packages,
             ["python3-workloadmgrclient", "python3-tvault-horizon-plugin"],
