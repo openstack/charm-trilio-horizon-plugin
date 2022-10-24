@@ -203,7 +203,7 @@ applications:
       openstack-origin: *trilio-openstack-origin
       triliovault-pkg-source: *triliovault-pkg-source
   trilio-horizon-plugin:
-    charm: ../../../trilio-horizon-plugin.charm
+    charm: ../../../trilio-horizon-plugin_ubuntu-18.04-amd64.charm
     options:
       triliovault-pkg-source: *triliovault-pkg-source
   trilio-wlm:
